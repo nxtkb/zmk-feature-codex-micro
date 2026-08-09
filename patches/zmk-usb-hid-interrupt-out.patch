@@ -1,0 +1,56 @@
+diff --git a/app/src/usb_hid.c b/app/src/usb_hid.c
+index 9adc7db8..6be3e392 100644
+--- a/app/src/usb_hid.c
++++ b/app/src/usb_hid.c
+@@ -32,6 +32,41 @@ static K_SEM_DEFINE(hid_sem, 1, 1);
+ 
+ static void in_ready_cb(const struct device *dev) { k_sem_give(&hid_sem); }
+ 
++#if IS_ENABLED(CONFIG_ENABLE_HID_INT_OUT_EP)
++static void out_ready_cb(const struct device *dev) {
++    uint8_t report[CONFIG_HID_INTERRUPT_EP_MPS];
++    uint32_t bytes_read = 0;
++    int err = hid_int_ep_read(dev, report, sizeof(report), &bytes_read);
++
++    if (err != 0) {
++        LOG_WRN("Failed to read USB HID OUT report: %d", err);
++        return;
++    }
++
++#if IS_ENABLED(CONFIG_ZMK_HID_INDICATORS)
++    struct zmk_hid_led_report_body *body;
++
++    if (bytes_read == sizeof(struct zmk_hid_led_report) &&
++        report[0] == ZMK_HID_REPORT_ID_LEDS) {
++        body = &((struct zmk_hid_led_report *)report)->body;
++    } else if (bytes_read == sizeof(struct zmk_hid_led_report_body)) {
++        /* Some hosts omit the report ID on a dedicated interrupt OUT
++         * endpoint. Accept that representation as well. */
++        body = (struct zmk_hid_led_report_body *)report;
++    } else {
++        LOG_WRN("Ignoring malformed USB HID OUT report: length=%u id=%u",
++                (unsigned int)bytes_read, bytes_read > 0 ? report[0] : 0);
++        return;
++    }
++
++    struct zmk_endpoint_instance endpoint = {
++        .transport = ZMK_TRANSPORT_USB,
++    };
++    zmk_hid_indicators_process_report(body, endpoint);
++#endif /* CONFIG_ZMK_HID_INDICATORS */
++}
++#endif /* CONFIG_ENABLE_HID_INT_OUT_EP */
++
+ #define HID_GET_REPORT_TYPE_MASK 0xff00
+ #define HID_GET_REPORT_ID_MASK 0x00ff
+ 
+@@ -180,6 +215,9 @@ static const struct hid_ops ops = {
+     .protocol_change = set_proto_cb,
+ #endif
+     .int_in_ready = in_ready_cb,
++#if IS_ENABLED(CONFIG_ENABLE_HID_INT_OUT_EP)
++    .int_out_ready = out_ready_cb,
++#endif
+     .get_report = get_report_cb,
+     .set_report = set_report_cb,
+ };

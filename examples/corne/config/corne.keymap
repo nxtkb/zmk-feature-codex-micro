@@ -1,0 +1,35 @@
+/* SPDX-License-Identifier: MIT */
+
+#include <behaviors.dtsi>
+#include <behaviors/codex_key.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/nxtkb/codex.h>
+
+#define DEFAULT 0
+#define CODEX 1
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            display-name = "DEFAULT";
+            bindings = <
+                &kp Q      &kp W     &kp E      &kp R      &kp T       &kp Y      &kp U      &kp I      &kp O      &kp P      &kp LBKT   &kp RBKT
+                &kp A      &kp S     &kp D      &kp F      &kp G       &kp H      &kp J      &kp K      &kp L      &kp SEMI   &kp SQT    &kp BSLH
+                &kp Z      &kp X     &kp C      &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH   &kp UP     &kp ENTER
+                                      &kp LCTRL  &kp LALT   &kp SPACE   &kp BSPC   &kp RGUI   &mo CODEX
+            >;
+        };
+
+        codex_layer {
+            display-name = "CODEX";
+            bindings = <
+                &codex_key CODEX_AGENT_0  &codex_key CODEX_AGENT_1  &codex_key CODEX_AGENT_2  &codex_key CODEX_AGENT_3  &codex_key CODEX_AGENT_4  &codex_key CODEX_AGENT_5  &trans                    &trans                       &trans                     &trans                    &trans  &trans
+                &codex_key CODEX_FAST     &codex_key CODEX_APPROVE  &codex_key CODEX_DECLINE  &codex_key CODEX_SPLIT    &codex_key CODEX_MIC      &codex_key CODEX_SEND     &trans                    &trans                       &trans                     &trans                    &trans  &trans
+                &trans                    &trans                     &trans                     &trans                     &trans                    &trans                    &trans                    &trans                       &trans                     &trans                    &trans  &trans
+                                                                                       &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+        };
+    };
+};

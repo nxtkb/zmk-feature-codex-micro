@@ -1,0 +1,12 @@
+include:
+  - board: nice_nano//zmk
+    shield: corne_left
+    snippet: nxtkb-codex-micro-usb
+    artifact-name: corne-left-codex-usb
+  - board: nice_nano//zmk
+    shield: corne_left
+    snippet: nxtkb-codex-micro-usb nxtkb-codex-micro-ble
+    artifact-name: corne-left-codex-usb-ble
+  - board: nice_nano//zmk
+    shield: corne_right
+    artifact-name: corne-right-standard

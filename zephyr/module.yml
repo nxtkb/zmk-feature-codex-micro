@@ -1,0 +1,7 @@
+name: zmk-feature-codex-micro
+build:
+  cmake: .
+  kconfig: Kconfig
+  settings:
+    dts_root: .
+    snippet_root: .

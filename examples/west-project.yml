@@ -1,0 +1,6 @@
+# Add this project entry to the `projects` list in your ZMK config's
+# config/west.yml. Pin a release tag or commit instead of `main` for firmware
+# you distribute.
+- name: zmk-feature-codex-micro
+  remote: nxtkb
+  revision: main

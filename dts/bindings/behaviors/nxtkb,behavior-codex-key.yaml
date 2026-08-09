@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+
+description: Send a Codex Micro Agent or Command Key event over the vendor USB HID transport
+
+compatible: "nxtkb,behavior-codex-key"
+
+include: one_param.yaml

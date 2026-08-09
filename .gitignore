@@ -1,0 +1,8 @@
+build/
+.west/
+*.log
+.DS_Store
+
+# Local interoperability identity. Keep it available in the NXTKB development
+# checkout, but exclude it from the public repository and release archives.
+snippets/nxtkb-codex-micro-lab-identity/

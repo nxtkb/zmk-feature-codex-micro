@@ -1,0 +1,3 @@
+name: nxtkb-codex-micro-ble
+append:
+  EXTRA_CONF_FILE: nxtkb-codex-micro-ble.conf

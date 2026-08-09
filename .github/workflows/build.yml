@@ -1,0 +1,75 @@
+name: Build examples
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  corne:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/zmkfirmware/zmk-build-arm:4.1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: usb
+            shield: corne_left
+            snippets: -S nxtkb-codex-micro-usb
+          - name: usb-ble
+            shield: corne_left
+            snippets: -S nxtkb-codex-micro-usb -S nxtkb-codex-micro-ble
+          - name: peripheral
+            shield: corne_right
+            snippets: ""
+    steps:
+      - name: Checkout module
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare west workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          workspace="${RUNNER_TEMP}/zmk-codex-workspace"
+          mkdir -p "${workspace}/config"
+          cp -R examples/corne/config/. "${workspace}/config/"
+          echo "workspace=${workspace}" >> "${GITHUB_ENV}"
+
+      - name: Initialize workspace
+        working-directory: ${{ env.workspace }}
+        run: west init -l config
+
+      - name: Update west projects
+        working-directory: ${{ env.workspace }}
+        run: west update --fetch-opt=--filter=tree:0
+
+      - name: Apply official-ZMK interrupt-OUT compatibility patch
+        working-directory: ${{ env.workspace }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C zmk apply --check "${GITHUB_WORKSPACE}/patches/zmk-usb-hid-interrupt-out.patch"
+          git -C zmk apply "${GITHUB_WORKSPACE}/patches/zmk-usb-hid-interrupt-out.patch"
+
+      - name: Export Zephyr CMake package
+        working-directory: ${{ env.workspace }}
+        run: west zephyr-export
+
+      - name: Build Corne ${{ matrix.name }} example
+        working-directory: ${{ env.workspace }}
+        shell: bash
+        run: >-
+          west build -s zmk/app -p -d "build/corne-${{ matrix.name }}"
+          -b nice_nano//zmk ${{ matrix.snippets }} --
+          -DSHIELD=${{ matrix.shield }}
+          -DZMK_CONFIG="${{ env.workspace }}/config"
+          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}"

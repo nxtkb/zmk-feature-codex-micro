@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: MIT
+
+menuconfig NXTKB_CODEX_MICRO
+    bool "NXTKB Codex Micro compatibility"
+    depends on ZMK_USB
+    depends on USB_DEVICE_HID
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    help
+      Adds a second, vendor-defined USB HID interface used by the experimental
+      Codex Micro compatibility profile. Bluetooth transport can be enabled
+      separately with NXTKB_CODEX_MICRO_BLE.
+
+if NXTKB_CODEX_MICRO
+
+config NXTKB_CODEX_MICRO_BLE
+    bool "Codex Micro compatible Bluetooth HOG transport"
+    depends on ZMK_BLE
+    help
+      Adds an encrypted vendor-defined HID-over-GATT service carrying report
+      ID 6 alongside ZMK's normal keyboard HOG service. Hosts must be paired
+      again after enabling this because HID report maps are cached.
+
+config NXTKB_CODEX_RX_QUEUE_DEPTH
+    int "Codex RX frame queue depth"
+    default 8
+    range 2 32
+
+config NXTKB_CODEX_TX_QUEUE_DEPTH
+    int "Codex TX message queue depth"
+    default 8
+    range 2 32
+
+config NXTKB_CODEX_RPC_BUFFER_SIZE
+    int "Codex RPC reassembly buffer size"
+    default 1536
+    range 256 4096
+
+config NXTKB_CODEX_TX_MESSAGE_SIZE
+    int "Maximum serialized Codex RPC message size"
+    default 384
+    range 128 1024
+
+config NXTKB_CODEX_FRAME_TIMEOUT_MS
+    int "Incomplete RPC frame timeout in milliseconds"
+    default 500
+    range 100 5000
+
+config NXTKB_CODEX_THREAD_STACK_SIZE
+    int "Codex RX/TX worker stack size"
+    default 2048
+    range 1024 8192
+
+config NXTKB_CODEX_LOG_LEVEL
+    int "Codex module log level"
+    default 2
+    range 0 4
+    help
+      0 off, 1 error, 2 warning, 3 info, 4 debug.
+
+endif

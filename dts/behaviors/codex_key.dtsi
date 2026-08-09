@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: MIT */
+
+/ {
+    behaviors {
+        /omit-if-no-ref/
+        codex_key: codex_key {
+            compatible = "nxtkb,behavior-codex-key";
+            #binding-cells = <1>;
+            display-name = "Codex Micro Key";
+        };
+    };
+};
