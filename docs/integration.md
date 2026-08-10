@@ -40,15 +40,19 @@ For a local checkout instead, add the module directory to
 
 ## 2. Apply the temporary official-ZMK compatibility patch
 
-From the ZMK checkout:
+When the module is listed as a west project, run this from the workspace root
+after `west update` and before `west build`:
 
 ```shell
-git apply /absolute/path/to/zmk-feature-codex-micro/patches/zmk-usb-hid-interrupt-out.patch
+west patch -sm zmk-feature-codex-micro apply
 ```
 
-Use `git apply --check` first in automated workflows. Stop applying the patch
-once the same interrupt-OUT callback is available in the pinned official ZMK
-revision. No other ZMK source change is required by the module.
+`west update` and `west build` do not apply patches automatically. The command
+uses `zephyr/patches.yml` to verify the patch checksum and target the `zmk`
+project. For a module checkout outside the west workspace, use `git apply
+--check` followed by `git apply` with the patch path instead. Stop applying the
+patch once the same interrupt-OUT callback is available in the pinned official
+ZMK revision. No other ZMK source change is required by the module.
 
 ## 3. Select transports in the central-half build
 

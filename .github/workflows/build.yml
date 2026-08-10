@@ -2,7 +2,9 @@ name: Build examples
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -42,6 +44,7 @@ jobs:
           workspace="${RUNNER_TEMP}/zmk-codex-workspace"
           mkdir -p "${workspace}/config"
           cp -R examples/corne/config/. "${workspace}/config/"
+          cp -R "${GITHUB_WORKSPACE}" "${workspace}/zmk-feature-codex-micro"
           echo "workspace=${workspace}" >> "${GITHUB_ENV}"
 
       - name: Initialize workspace
@@ -54,11 +57,7 @@ jobs:
 
       - name: Apply official-ZMK interrupt-OUT compatibility patch
         working-directory: ${{ env.workspace }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          git -C zmk apply --check "${GITHUB_WORKSPACE}/patches/zmk-usb-hid-interrupt-out.patch"
-          git -C zmk apply "${GITHUB_WORKSPACE}/patches/zmk-usb-hid-interrupt-out.patch"
+        run: west patch -sm zmk-feature-codex-micro apply
 
       - name: Export Zephyr CMake package
         working-directory: ${{ env.workspace }}
@@ -72,4 +71,4 @@ jobs:
           -b nice_nano//zmk ${{ matrix.snippets }} --
           -DSHIELD=${{ matrix.shield }}
           -DZMK_CONFIG="${{ env.workspace }}/config"
-          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}"
+          -DZMK_EXTRA_MODULES="${{ env.workspace }}/zmk-feature-codex-micro"

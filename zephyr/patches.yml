@@ -1,0 +1,13 @@
+patches:
+  - path: zmk/zmk-usb-hid-interrupt-out.patch
+    sha256sum: 24a4608004e8ed86dacbd21383fb40a42c94501574d1c741fd2d5e7e612baeb7
+    module: zmk
+    author: k4i
+    email: sky_io@outlook.com
+    date: 2026-08-09
+    upstreamable: true
+    apply-command: git apply
+    comments: |
+      Drain the normal ZMK HID instance's interrupt OUT endpoint when the
+      global Zephyr option is enabled for the Codex vendor HID instance.
+      Remove this patch after an equivalent callback is available upstream.
