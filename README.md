@@ -67,9 +67,17 @@ its OUT endpoint when the module enables the option for `HID_1`.
 Official ZMK main did not provide this callback as of commit
 `268b1b1e82150460f00fd701bcd08583d5c75d29` (2026-08-06). Until an equivalent
 change is merged upstream, apply
-[`patches/zmk-usb-hid-interrupt-out.patch`](patches/zmk-usb-hid-interrupt-out.patch)
-to an official ZMK checkout. This is a focused compatibility patch, not a ZMK
-fork, and is intended to be removed from the setup after upstream adoption.
+the module's versioned West patch metadata:
+
+```shell
+west update
+west patch -sm zmk-feature-codex-micro apply
+```
+
+The patch is stored at
+[`zephyr/patches/zmk/zmk-usb-hid-interrupt-out.patch`](zephyr/patches/zmk/zmk-usb-hid-interrupt-out.patch)
+and integrity-checked by `zephyr/patches.yml`. This is a focused compatibility
+patch, not a ZMK fork, and is intended to be removed after upstream adoption.
 
 ## Discovery and device identity
 
@@ -84,6 +92,11 @@ An integrator must use identifiers they are authorized to use and validate how
 the installed ChatGPT app discovers the device. Do not copy another vendor's
 VID, PID, manufacturer, model, serial number, or Bluetooth identity into a
 distributed build.
+
+The reusable user-config workflow is kept in this module because it applies the
+module's version-matched ZMK compatibility patch before building. Keyboard
+repositories should pin the workflow to a reviewed commit so the module,
+patch, and build procedure advance together without requiring a ZMK fork.
 
 ## Protocol behavior
 
