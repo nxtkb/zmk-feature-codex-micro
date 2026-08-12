@@ -74,6 +74,19 @@ include:
     snippet: nxtkb-codex-micro-usb nxtkb-codex-micro-ble
 ```
 
+To opt into the minimal identity currently recognized by ChatGPT desktop, append
+the compatibility snippet:
+
+```yaml
+include:
+  - board: nice_nano//zmk
+    shield: corne_left
+    snippet: nxtkb-codex-micro-usb nxtkb-codex-micro-ble nxtkb-codex-micro-compat-identity
+```
+
+This last snippet changes only USB VID/PID and Bluetooth PnP VID/PID. Review the
+[release boundary](#release-boundary) before distributing a build that enables it.
+
 Do not add the snippets to a split peripheral such as `corne_right`. Codex runs
 on the ZMK central half and follows the central's selected endpoint.
 
@@ -137,6 +150,12 @@ For every target keyboard:
 ## Release boundary
 
 The module source, protocol behavior, key behavior, examples, and generic ZMK
-patch can be published under MIT. Do not publish firmware built with
-`nxtkb-codex-micro-lab-identity`. Production firmware needs device identifiers
-the distributor is authorized to use and a supported ChatGPT discovery path.
+patch are published under MIT. The optional `nxtkb-codex-micro-compat-identity`
+snippet changes only the USB VID/PID and Bluetooth PnP VID/PID currently needed
+for ChatGPT desktop discovery. It deliberately does not own or override the
+keyboard's product, manufacturer, Bluetooth, or Device Information strings.
+
+These identifiers are interoperability values, not evidence of OpenAI certification
+or an identifier assignment to third-party keyboard makers. Integrators are
+responsible for determining whether they are authorized to distribute firmware
+using them. The discovery behavior is undocumented and may change in ChatGPT.
