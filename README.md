@@ -28,7 +28,9 @@ Louder SDK, firmware, or officially certified accessory.
 1. Add this repository as a project in your ZMK config's `config/west.yml`.
 2. Apply the small official-ZMK compatibility patch described below.
 3. Add `nxtkb-codex-micro-usb` to the central-half build snippets. Add
-   `nxtkb-codex-micro-ble` if Bluetooth control is required.
+   `nxtkb-codex-micro-ble` if Bluetooth control is required. Add the optional
+   `nxtkb-codex-micro-compat-identity` snippet only after reviewing the identity
+   and distribution notice below.
 4. Include the behavior and key IDs in the keymap:
 
 ```dts
@@ -54,6 +56,7 @@ See [the complete integration guide](docs/integration.md) and the buildable
 | --- | --- |
 | `nxtkb-codex-micro-usb` | Enables the module and its second USB HID interface. |
 | `nxtkb-codex-micro-ble` | Adds Codex HID-over-GATT to the active ZMK Bluetooth profile. |
+| `nxtkb-codex-micro-compat-identity` | Supplies the minimal USB and Bluetooth PnP identifiers currently used by ChatGPT discovery. |
 
 Only the central half should enable the module. A split peripheral uses its
 normal firmware.
@@ -83,15 +86,16 @@ patch, not a ZMK fork, and is intended to be removed after upstream adoption.
 
 The transport and protocol implementation are reusable, but the current
 ChatGPT desktop app does not expose a documented third-party device discovery
-or certification mechanism. The NXTKB development checkout may contain a
-gitignored lab identity solely to verify interoperability. It is deliberately
-excluded from the public module and uses identifiers that must not appear in
-published firmware.
+or certification mechanism. Interoperability tests indicate that discovery
+currently depends on USB VID/PID and Bluetooth PnP VID/PID. The optional
+`nxtkb-codex-micro-compat-identity` snippet supplies only those four fields;
+user-visible product, manufacturer, model, and Bluetooth names remain owned by
+the keyboard configuration.
 
-An integrator must use identifiers they are authorized to use and validate how
-the installed ChatGPT app discovers the device. Do not copy another vendor's
-VID, PID, manufacturer, model, serial number, or Bluetooth identity into a
-distributed build.
+The compatibility identifiers are not evidence of OpenAI certification or an
+identifier assignment to NXTKB or third-party keyboard makers. Integrators are
+responsible for determining whether they may distribute firmware using them.
+The undocumented discovery behavior may change in future ChatGPT releases.
 
 The reusable user-config workflow is kept in this module because it applies the
 module's version-matched ZMK compatibility patch before building. Keyboard

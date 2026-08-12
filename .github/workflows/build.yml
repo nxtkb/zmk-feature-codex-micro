@@ -28,6 +28,9 @@ jobs:
           - name: usb-ble
             shield: corne_left
             snippets: -S nxtkb-codex-micro-usb -S nxtkb-codex-micro-ble
+          - name: usb-ble-compat-identity
+            shield: corne_left
+            snippets: -S nxtkb-codex-micro-usb -S nxtkb-codex-micro-ble -S nxtkb-codex-micro-compat-identity
           - name: peripheral
             shield: corne_right
             snippets: ""

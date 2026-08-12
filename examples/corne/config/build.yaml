@@ -8,5 +8,9 @@ include:
     snippet: nxtkb-codex-micro-usb nxtkb-codex-micro-ble
     artifact-name: corne-left-codex-usb-ble
   - board: nice_nano//zmk
+    shield: corne_left
+    snippet: nxtkb-codex-micro-usb nxtkb-codex-micro-ble nxtkb-codex-micro-compat-identity
+    artifact-name: corne-left-codex-usb-ble-compat-identity
+  - board: nice_nano//zmk
     shield: corne_right
     artifact-name: corne-right-standard
