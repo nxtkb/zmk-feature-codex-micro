@@ -63,6 +63,10 @@ normal firmware.
 
 ## Required official-ZMK patch
 
+The Corne example pins official ZMK
+`4de313367288aad5aeaa1243890e40dc813f7008`; the patch below still applies to
+that revision.
+
 The legacy Zephyr USB HID option used for interrupt-OUT is global to all HID
 instances. Consequently, ZMK's normal `HID_0` also needs a callback that drains
 its OUT endpoint when the module enables the option for `HID_1`.
@@ -101,6 +105,20 @@ The reusable user-config workflow is kept in this module because it applies the
 module's version-matched ZMK compatibility patch before building. Keyboard
 repositories should pin the workflow to a reviewed commit so the module,
 patch, and build procedure advance together without requiring a ZMK fork.
+
+The workflow's `patch_modules` input selects newline-separated patch sources
+and defaults to this module. A keyboard with additional core patches can set:
+
+```yaml
+patch_modules: |
+  zmk-feature-codex-micro
+  zmk-vfx-sweep-pro-display
+```
+
+Each module's `zephyr/patches.yml` is applied after `west update` and before
+building. Use `.` for patches owned by the caller module being checked out;
+this lets a module's own CI test its pending patches without publishing them
+first. Leave the input unset for the ordinary Codex-only integration.
 
 ## Protocol behavior
 

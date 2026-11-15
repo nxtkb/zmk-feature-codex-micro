@@ -23,6 +23,11 @@ on:
         default: codex-firmware
         required: false
         type: string
+      patch_modules:
+        description: Newline-separated patch source modules; use . for the caller module
+        default: zmk-feature-codex-micro
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -104,9 +109,23 @@ jobs:
         working-directory: ${{ env.base_dir }}
         run: west update --fetch-opt=--filter=tree:0
 
-      - name: Apply Codex ZMK compatibility patch
+      - name: Apply official ZMK compatibility patches
         working-directory: ${{ env.base_dir }}
-        run: west patch -sm zmk-feature-codex-micro apply
+        shell: bash
+        env:
+          PATCH_MODULES: ${{ inputs.patch_modules }}
+        run: |
+          set -euo pipefail
+          while IFS= read -r patch_module || [[ -n "${patch_module}" ]]; do
+            [[ -z "${patch_module}" ]] && continue
+            if [[ "${patch_module}" == "." ]]; then
+              # West 1.5 resolves patch sources inside the west workspace.
+              patch_module=".caller-patches"
+              mkdir -p "${patch_module}"
+              cp -R "${GITHUB_WORKSPACE}/zephyr" "${patch_module}/"
+            fi
+            west patch -sm "${patch_module}" apply
+          done <<< "${PATCH_MODULES}"
 
       - name: Export Zephyr CMake package
         working-directory: ${{ env.base_dir }}
