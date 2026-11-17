@@ -75,3 +75,13 @@ jobs:
           -DSHIELD=${{ matrix.shield }}
           -DZMK_CONFIG="${{ env.workspace }}/config"
           -DZMK_EXTRA_MODULES="${{ env.workspace }}/zmk-feature-codex-micro"
+
+      - name: Check Bluetooth HID service order
+        working-directory: ${{ env.workspace }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          build_dir="build/corne-${{ matrix.name }}"
+          if grep -qx 'CONFIG_NXTKB_CODEX_MICRO_BLE=y' "${build_dir}/zephyr/.config"; then
+            python3 zmk-feature-codex-micro/scripts/check-hog-service-order.py "${build_dir}/zephyr/zmk.elf"
+          fi
