@@ -184,8 +184,12 @@ static ssize_t write_ctrl_point(struct bt_conn *conn, const struct bt_gatt_attr 
     return len;
 }
 
+/* Zephyr sorts static GATT services by symbol name. Android's HOGP host selects
+ * only the first HID service, so this must sort after ZMK's normal hog_svc.
+ * Otherwise Android sees only the vendor collection and creates no keyboard.
+ */
 BT_GATT_SERVICE_DEFINE(
-    codex_hog_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_HIDS),
+    nxtkb_codex_hog_svc, BT_GATT_PRIMARY_SERVICE(BT_UUID_HIDS),
     BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_INFO, BT_GATT_CHRC_READ, BT_GATT_PERM_READ,
                            read_info, NULL, &codex_hids_info),
     BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT_MAP, BT_GATT_CHRC_READ,
@@ -220,7 +224,7 @@ bool nxtkb_codex_ble_transport_ready(nxtkb_codex_route_t route)
     }
 
     bool ready = nxtkb_codex_transport_route_is_valid(route) &&
-                 bt_gatt_is_subscribed(conn, &codex_hog_svc.attrs[6], BT_GATT_CCC_NOTIFY);
+                 bt_gatt_is_subscribed(conn, &nxtkb_codex_hog_svc.attrs[6], BT_GATT_CCC_NOTIFY);
     bt_conn_unref(conn);
     return ready;
 }
@@ -269,7 +273,7 @@ static void codex_ble_tx_thread(void *arg1, void *arg2, void *arg3)
         }
 
         bool ready = profile_index >= 0 &&
-                     bt_gatt_is_subscribed(conn, &codex_hog_svc.attrs[6], BT_GATT_CCC_NOTIFY);
+                     bt_gatt_is_subscribed(conn, &nxtkb_codex_hog_svc.attrs[6], BT_GATT_CCC_NOTIFY);
         if (!ready) {
             bt_conn_unref(conn);
             continue;
@@ -289,7 +293,7 @@ static void codex_ble_tx_thread(void *arg1, void *arg2, void *arg3)
             codex_input_report[1] = fragment_length;
             memcpy(&codex_input_report[2], &message.data[offset], fragment_length);
 
-            int err = bt_gatt_notify(conn, &codex_hog_svc.attrs[6], codex_input_report,
+            int err = bt_gatt_notify(conn, &nxtkb_codex_hog_svc.attrs[6], codex_input_report,
                                      sizeof(codex_input_report));
             if (err != 0) {
                 LOG_WRN("Unable to send Codex BLE report: %d", err);

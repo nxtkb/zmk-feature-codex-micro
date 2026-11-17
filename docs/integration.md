@@ -159,3 +159,14 @@ These identifiers are interoperability values, not evidence of OpenAI certificat
 or an identifier assignment to third-party keyboard makers. Integrators are
 responsible for determining whether they are authorized to distribute firmware
 using them. The discovery behavior is undocumented and may change in ChatGPT.
+
+## Bluetooth host compatibility
+
+The normal ZMK keyboard HID service must precede the Codex vendor HID service.
+Some hosts, including Android 16, select only the first primary HID service.
+The module's internal service symbol sorts after ZMK's `hog_svc`; custom service
+changes should preserve this order. The build workflow checks the linked ELF
+with `scripts/check-hog-service-order.py`.
+
+After changing HID descriptors or service layout, forget the affected host pairing,
+clear only that keyboard profile and pair again to refresh cached information.

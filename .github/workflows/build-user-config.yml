@@ -142,6 +142,20 @@ jobs:
           ${{ env.extra_modules }}
           ${{ matrix.cmake-args }}
 
+      - name: Check Bluetooth HID service order
+        working-directory: ${{ env.base_dir }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -qx 'CONFIG_NXTKB_CODEX_MICRO_BLE=y' "${{ env.build_dir }}/zephyr/.config"; then
+            checker="${GITHUB_WORKSPACE}/scripts/check-hog-service-order.py"
+            if [[ ! -f "${checker}" ]]; then
+              module_dir=$(west list -f '{abspath}' zmk-feature-codex-micro)
+              checker="${module_dir}/scripts/check-hog-service-order.py"
+            fi
+            python3 "${checker}" "${{ env.build_dir }}/zephyr/zmk.elf"
+          fi
+
       - name: Collect firmware
         shell: bash
         run: |
